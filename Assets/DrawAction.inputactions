@@ -1,0 +1,76 @@
+{
+    "name": "DrawAction",
+    "maps": [
+        {
+            "name": "DrawAction",
+            "id": "2df1b634-48fc-4513-979c-dc3b6afaf790",
+            "actions": [
+                {
+                    "name": "StartDraw",
+                    "type": "Button",
+                    "id": "01a6cd75-38f8-4b94-8f8c-e12c87083efc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EndDraw",
+                    "type": "Button",
+                    "id": "a0a43749-7d6e-4128-8af6-ac58c5934548",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2f5887fc-fe42-42a8-ab1e-49023bcc194d",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StartDraw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c67e921e-04ad-4044-a075-90c4ee9770d5",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StartDraw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1fdb44f9-bcd9-4f9e-b6b0-6a533c7cfdbe",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EndDraw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "10142294-516e-4f8c-a371-8c9ecd3bf9d3",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EndDraw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
