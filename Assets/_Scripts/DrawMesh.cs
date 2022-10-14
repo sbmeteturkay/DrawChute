@@ -5,18 +5,35 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Collections;
-
+using UnityEngine.ProBuilder;
+using UnityEngine.ProBuilder.MeshOperations;
 namespace MeteTurkay{
 	public class DrawMesh : MonoBehaviour
 	{
+		public MeshCollider drawArea;
 		Camera cam;
+		GameObject drawing;
+		[SerializeField] GameObject parachute;
+		[SerializeField] Transform leftHand;
+		[SerializeField] Transform rightHand;
+		bool hasDrawingStarted;
+		private bool IsCursorInDrawArea{
+            get
+			{
+				return drawArea.bounds.Contains(cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 11)));
+			}
+		}
         private void Start()
         {
 			cam = GetComponent<PlayerInput>().camera;
         }
 		private IEnumerator Draw()
         {
-			GameObject drawing = new GameObject("Drawing");
+			hasDrawingStarted = true;
+			 drawing = new GameObject("Drawing");
+
+			drawing.transform.localScale = new Vector3(1, 1, 0);
+
 			drawing.AddComponent<MeshFilter>();
 			drawing.AddComponent<MeshRenderer>();
 			Mesh mesh = new Mesh();
@@ -48,7 +65,7 @@ namespace MeteTurkay{
 			drawing.GetComponent<MeshFilter>().mesh = mesh;
 			drawing.GetComponent<Renderer>().material.color = Color.red;
 			Vector3 lastMousePosition = startPosition;
-            while (true)
+			while (IsCursorInDrawArea)
             {
 				float minDistance = 0.1f;
 				float distance = Vector3.Distance(cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10)), lastMousePosition);
@@ -74,7 +91,7 @@ namespace MeteTurkay{
 				Vector3 currentMousePosition = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10));
 				Vector3 mouseFowardVector = (currentMousePosition - lastMousePosition).normalized;
 
-				float lineThickness = 0.25f;
+				float lineThickness = 0.10f;
 
 				Vector3 topRightVertex = currentMousePosition + Vector3.Cross(mouseFowardVector, Vector3.back)*lineThickness;
 				Vector3 bottomRightVertex = currentMousePosition + Vector3.Cross(mouseFowardVector, Vector3.forward) * lineThickness;
@@ -140,15 +157,55 @@ namespace MeteTurkay{
         {
 			if (!callbackContext.performed)
 				return;
-			print("start draw");
+			if (!IsCursorInDrawArea)
+				return;
 			StartCoroutine(Draw());
         }
 		public void EndDraw(InputAction.CallbackContext callbackContext)
 		{
 			if (!callbackContext.performed)
 				return;
-			print("enddraw");
+			if (!hasDrawingStarted)
+				return;
+			hasDrawingStarted = false;
 			StopAllCoroutines();
+			Redraw();
+			CalculateNormals();
+			Mesh mesh = drawing.GetComponent<MeshFilter>().mesh;
+			Mesh parashuteMesh = new Mesh();
+			parachute.GetComponent<Renderer>().material.color = Color.red;
+			parashuteMesh.vertices = mesh.vertices;
+			parashuteMesh.triangles = mesh.triangles;
+			parashuteMesh.normals = mesh.normals;
+			print(parashuteMesh.vertices[0]);
+			print(parashuteMesh.vertices[parashuteMesh.vertices.Length-1]);
+			parachute.GetComponent<MeshFilter>().mesh = parashuteMesh;
+			parachute.GetComponent<MeshCollider>().sharedMesh = parashuteMesh;
+			parachute.transform.localPosition = new Vector3(parashuteMesh.vertices[parashuteMesh.vertices.Length - 1].x/2, parachute.transform.localPosition.y, parashuteMesh.vertices[parashuteMesh.vertices.Length - 1].z / 2);
+			Destroy(drawing);
+		}
+		private void Redraw()
+        {
+			Mesh mesh = drawing.GetComponent<MeshFilter>().mesh;
+			Vector3[] vertices = mesh.vertices;
+
+			//Redraw from zero
+			for(int i = 1; i < vertices.Length; i++)
+            {
+				vertices[i] = new Vector3(vertices[i].x + (vertices[0].x * -1),
+					vertices[i].y + (vertices[0].y * -1),
+					vertices[i].z + (vertices[0].z * -1));
+            }
+			vertices[0] = Vector3.zero;
+			mesh.vertices = vertices;
+        }
+		private void CalculateNormals()
+		{
+			new MeshImporter(drawing).Import();
+			ProBuilderMesh proMesh = drawing.GetComponent<ProBuilderMesh>();
+			Normals.CalculateNormals(proMesh);
+			proMesh.ToMesh();
+			proMesh.Refresh();
 		}
 	}
 }
