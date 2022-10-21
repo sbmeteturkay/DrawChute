@@ -14,9 +14,11 @@ namespace MeteTurkay{
 		Camera cam;
 		GameObject drawing;
 		[SerializeField] GameObject parachute;
-		[SerializeField] Transform leftHand;
-		[SerializeField] Transform rightHand;
+		[SerializeField] LineRenderer leftHand;
+		[SerializeField] LineRenderer rightHand;
 		bool hasDrawingStarted;
+		[SerializeField] DrawLines leftRope;
+		[SerializeField] DrawLines rightRope;
 		private bool IsCursorInDrawArea{
             get
 			{
@@ -182,6 +184,12 @@ namespace MeteTurkay{
 			parachute.GetComponent<MeshFilter>().mesh = parashuteMesh;
 			parachute.GetComponent<MeshCollider>().sharedMesh = parashuteMesh;
 			parachute.transform.localPosition = new Vector3(parashuteMesh.vertices[parashuteMesh.vertices.Length - 1].x/2, parachute.transform.localPosition.y, parashuteMesh.vertices[parashuteMesh.vertices.Length - 1].z / 2);
+			//leftHand.SetPosition(0, leftHand.transform.parent.localPosition);
+			//leftHand.SetPosition(1, leftHand.transform.TransformPoint(parachute.transform.TransformPoint(parachute.GetComponent<MeshFilter>().mesh.vertices[0])));
+			//rightHand.SetPosition(1, rightHand.transform.TransformPoint(parachute.transform.TransformPoint(parachute.GetComponent<MeshFilter>().mesh.vertices[parashuteMesh.vertices.Length - 1])));
+			//rightHand.SetPosition(0,rightHand.transform.parent.localPosition);
+			rightRope.AddItem(parachute);
+			leftRope.AddItem(parachute.GetComponent<MeshFilter>().mesh.vertices[parashuteMesh.vertices.Length - 1].normalized);
 			Destroy(drawing);
 		}
 		private void Redraw()
