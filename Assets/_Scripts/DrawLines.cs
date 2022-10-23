@@ -82,9 +82,14 @@ namespace MeteTurkay{
                 MeshRenderer ringRenderer = ringOffsetCylinderMeshObject.AddComponent<MeshRenderer>();
                 ringRenderer.material = lineMat;
         }
-        public void AddItem(Vector3 transform)
+        public void ResetAndAddItem(Vector3 transform,Transform parent)
         {
+            DestroyListObjects(points);
+            DestroyListObjects(ringGameObjects);
+            points.Clear();
+            ringGameObjects.Clear();
             GameObject obj = new GameObject();
+            obj.transform.parent = parent;
             obj.transform.position = transform;
             points.Add(obj);
             print("for");
@@ -128,6 +133,13 @@ namespace MeteTurkay{
                 // Since the cylinder is pointing up(y) and the forward is z, we need to offset by 90 degrees.
                 this.ringGameObjects[i].transform.LookAt(this.mainPoint.transform, Vector3.up);
                 this.ringGameObjects[i].transform.rotation *= Quaternion.Euler(90, 0, 0);
+            }
+        }
+        void DestroyListObjects(List<GameObject> ts)
+        {
+            for (int i = 0; i < ts.Count; i++)
+            {
+                Destroy(ts[i]);
             }
         }
     }

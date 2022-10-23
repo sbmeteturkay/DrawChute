@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Collections;
+using DG.Tweening;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
 namespace MeteTurkay{
@@ -175,6 +176,7 @@ namespace MeteTurkay{
 			CalculateNormals();
 			Mesh mesh = drawing.GetComponent<MeshFilter>().mesh;
 			Mesh parashuteMesh = new Mesh();
+			parachute.transform.localScale = Vector3.one * 0.1f;
 			parachute.GetComponent<Renderer>().material.color = Color.red;
 			parashuteMesh.vertices = mesh.vertices;
 			parashuteMesh.triangles = mesh.triangles;
@@ -184,12 +186,19 @@ namespace MeteTurkay{
 			parachute.GetComponent<MeshFilter>().mesh = parashuteMesh;
 			parachute.GetComponent<MeshCollider>().sharedMesh = parashuteMesh;
 			parachute.transform.localPosition = new Vector3(parashuteMesh.vertices[parashuteMesh.vertices.Length - 1].x/2, parachute.transform.localPosition.y, parashuteMesh.vertices[parashuteMesh.vertices.Length - 1].z / 2);
-			//leftHand.SetPosition(0, leftHand.transform.parent.localPosition);
-			//leftHand.SetPosition(1, leftHand.transform.TransformPoint(parachute.transform.TransformPoint(parachute.GetComponent<MeshFilter>().mesh.vertices[0])));
-			//rightHand.SetPosition(1, rightHand.transform.TransformPoint(parachute.transform.TransformPoint(parachute.GetComponent<MeshFilter>().mesh.vertices[parashuteMesh.vertices.Length - 1])));
-			//rightHand.SetPosition(0,rightHand.transform.parent.localPosition);
-			rightRope.AddItem(parachute);
-			leftRope.AddItem(parachute.GetComponent<MeshFilter>().mesh.vertices[parashuteMesh.vertices.Length - 1].normalized);
+			parachute.transform.DOScale(Vector3.one,0.3f);
+			
+
+			//check which side will be left or right
+			if(parachute.transform.position.x< parachute.transform.TransformPoint(parachute.GetComponent<MeshFilter>().mesh.vertices[parashuteMesh.vertices.Length - 1]).x){
+				rightRope.ResetAndAddItem(parachute.transform.position, parachute.transform);
+				leftRope.ResetAndAddItem(parachute.transform.TransformPoint(parachute.GetComponent<MeshFilter>().mesh.vertices[parashuteMesh.vertices.Length - 1]), parachute.transform);
+			}
+            else
+            {
+				rightRope.ResetAndAddItem(parachute.transform.TransformPoint(parachute.GetComponent<MeshFilter>().mesh.vertices[parashuteMesh.vertices.Length - 1]), parachute.transform);
+				leftRope.ResetAndAddItem(parachute.transform.position, parachute.transform);
+			}
 			Destroy(drawing);
 		}
 		private void Redraw()
